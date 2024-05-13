@@ -1441,13 +1441,10 @@ struct Legitbot
 			return;
 
 		if (Features::RCS::RCSEnabled) {
-			UpdateRCSSettings();
-
 			if (Features::RCS::RCSMode == 1) // Combined
 				return; // Combined Is In StartAiming() && MoveMouse()
-
-			if (Features::Aimbot::InputMethod == 1) // Memory Input Method - Must Use Combined
-				return; // Combined Is In StartAiming() && MoveMouse()
+			
+			UpdateRCSSettings();
 
 			if (Features::RCS::OnADS) {
 
@@ -1457,7 +1454,6 @@ struct Legitbot
 					return;
 				if (!Myself->IsInAttack)
 					return;
-
 
 				int PitchPower;
 				int YawPower;
@@ -1471,7 +1467,6 @@ struct Legitbot
 					YawPower = Features::RCS::YawPower;
 				}
 
-				std::cout << "aaaa" << std::endl;
 				FloatVector2D punchAnglesDiff = Myself->punchAnglesDiff;
 				if (punchAnglesDiff.isZeroVector())
 					return;
@@ -1479,7 +1474,6 @@ struct Legitbot
 					? RoundHalfEven(punchAnglesDiff.x * PitchPower)
 					: 0;
 				int yaw = RoundHalfEven(-punchAnglesDiff.y * YawPower);
-				std::cout << "Moving Mouse" << std::endl;
 				X11Display->MoveMouse(pitch, yaw);
 			}
 
@@ -1508,7 +1502,6 @@ struct Legitbot
 					? RoundHalfEven(punchAnglesDiff.x * PitchPower)
 					: 0;
 				int yaw = RoundHalfEven(-punchAnglesDiff.y * YawPower);
-				std::cout << "Moving Mouse" << std::endl;
 				X11Display->MoveMouse(pitch, yaw);
 			}
 		}
@@ -1556,6 +1549,10 @@ struct Legitbot
 
 				int totalYawIncrementInt = RoundHalfEven(AL1AF0(aimbotDelta.x));
 				int totalPitchIncrementInt = RoundHalfEven(AL1AF0(aimbotDelta.y * -1));
+
+				//Deadzone - Are We Close Enough Yet?
+				if (fabs(CurrentTarget->aimbotDesiredAnglesIncrement.x) < Features::Aimbot::Deadzone) totalPitchIncrementInt = 0;
+				if (fabs(CurrentTarget->aimbotDesiredAnglesIncrement.y) < Features::Aimbot::Deadzone) totalYawIncrementInt = 0;
 
 				// Move Mouse
 				if (totalPitchIncrementInt == 0 && totalYawIncrementInt == 0)
@@ -1612,6 +1609,10 @@ struct Legitbot
 				// Turn into integers
 				int totalPitchIncrementInt = RoundHalfEven(AL1AF0(totalPitchIncrement));
 				int totalYawIncrementInt = RoundHalfEven(AL1AF0(totalYawIncrement));
+
+				//Deadzone - Are We Close Enough Yet?
+				if (fabs(CurrentTarget->aimbotDesiredAnglesIncrement.x) < Features::Aimbot::Deadzone) totalPitchIncrementInt = 0;
+				if (fabs(CurrentTarget->aimbotDesiredAnglesIncrement.y) < Features::Aimbot::Deadzone) totalYawIncrementInt = 0;
 
 				// Move Mouse
 				if (totalPitchIncrementInt == 0 && totalYawIncrementInt == 0) return;

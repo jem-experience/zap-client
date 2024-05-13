@@ -307,11 +307,11 @@ struct Menu
 						if (Features::Aimbot::SmoothingMethod == 0) // Static
 						{
 							if (Features::Aimbot::AimbotMode == 0) {
-								ImGui::MainSliderFloat("Hipfire Smoothing", &Features::Aimbot::HipfireSmooth, 0, 0.99, "%.3f");
+								ImGui::MainSliderFloat("Hipfire Smoothing", &Features::Aimbot::HipfireSmooth, 0, 0.999, "%.3f");
 								if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled))
 									ImGui::SetTooltip("Smoothing for the Aim-Assist whilst hipfiring.\nHigher = Smoother");
 
-								ImGui::MainSliderFloat("ADS Smoothing", &Features::Aimbot::ADSSmooth, 0, 0.99, "%.3f");
+								ImGui::MainSliderFloat("ADS Smoothing", &Features::Aimbot::ADSSmooth, 0, 0.999, "%.3f");
 								if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled))
 									ImGui::SetTooltip("Smoothing for the Aim-Assist whilst ADS.\nHigher = Smoother");
 							}
@@ -328,19 +328,19 @@ struct Menu
 						if (Features::Aimbot::SmoothingMethod == 1) // Random
 						{
 							if (Features::Aimbot::AimbotMode == 0) {
-								ImGui::MainSliderFloat("Minimum Hipfire Smoothing", &Features::Aimbot::MinHipfireSmooth, 0, 0.99, "%.3f");
+								ImGui::MainSliderFloat("Minimum Hipfire Smoothing", &Features::Aimbot::MinHipfireSmooth, 0, 0.999, "%.3f");
 								if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled))
 									ImGui::SetTooltip("Minimum Smoothing for the Aim-Assist whilst hipfiring.\nHigher = Smoother");
 
-								ImGui::MainSliderFloat("Maximum Hipfire Smoothing", &Features::Aimbot::MaxHipfireSmooth, 0, 0.99, "%.3f");
+								ImGui::MainSliderFloat("Maximum Hipfire Smoothing", &Features::Aimbot::MaxHipfireSmooth, 0, 0.999, "%.3f");
 								if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled))
 									ImGui::SetTooltip("Maximum Smoothing for the Aim-Assist whilst hipfiring.\nHigher = Smoother");
 
-								ImGui::MainSliderFloat("Minimum ADS Smoothing", &Features::Aimbot::MinADSSmooth, 0, 0.99, "%.3f");
+								ImGui::MainSliderFloat("Minimum ADS Smoothing", &Features::Aimbot::MinADSSmooth, 0, 0.999, "%.3f");
 								if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled))
 									ImGui::SetTooltip("Minimum Smoothing for the Aim-Assist whilst ADS.\nHigher = Smoother");
 
-								ImGui::MainSliderFloat("Maximum ADS Smoothing", &Features::Aimbot::MaxADSSmooth, 0, 0.99, "%.3f");
+								ImGui::MainSliderFloat("Maximum ADS Smoothing", &Features::Aimbot::MaxADSSmooth, 0, 0.999, "%.3f");
 								if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled))
 									ImGui::SetTooltip("Maximum Smoothing for the Aim-Assist whilst ADS.\nHigher = Smoother");
 							}
@@ -367,6 +367,12 @@ struct Menu
 							ImGui::MainSliderFloat("Distance Smoothing##Test", &Features::Aimbot::MouseExtraSmoothing, 1, 9999, "%.0f");
 							if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled))
 								ImGui::SetTooltip("Increases the smoothing depending on the distance of the player.");
+						}
+
+						if (Features::Aimbot::InputMethod == 0) { // Mouse Only
+							ImGui::MainSliderFloat("Deadzone", &Features::Aimbot::Deadzone, 0, 10, "%.03f");
+							if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled))
+								ImGui::SetTooltip("If the aimbot is close enough then the aimbot will stop trying to get any closer.\n If you have very low smoothing then you might want to up this to prevent 'shaking'.");
 						}
 
 						ImGui::MainSliderInt("Delay", &Features::Aimbot::Delay, 1, 50);
@@ -843,10 +849,6 @@ struct Menu
 				{
 					ImGui::Spacing();
 
-					if (Features::Aimbot::InputMethod == 1 && Features::RCS::RCSMode == 0) {
-						ImGui::Text("Selected Aimbot Input Method Is Incompatible With Standalone RCS! Switch To Combined!");
-					}
-
 					if (Features::RCS::RCSMode == 1 && Features::Aimbot::AimbotMode == 1) {
 						ImGui::Text("Selected Aimbot Mode Is Incompatible With Combined RCS! Switch To Standalone!");
 					}
@@ -870,7 +872,7 @@ struct Menu
 								ImGui::SetTooltip("Yaw Power");
 						}
 
-						if (Features::RCS::RCSMode == 1 && !Features::Aimbot::AimbotMode == 1) {
+						if (Features::RCS::RCSMode == 1 && Features::Aimbot::AimbotMode == 0) {
 							ImGui::MainSliderFloat("Pitch Reduction %", &Features::RCS::PitchReduction, 0, 100, "%.0f");
 							if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled))
 								ImGui::SetTooltip("Percentage Of Horizontal Recoil That Will Be Reduced.");
@@ -1635,7 +1637,7 @@ struct Menu
 				if (ImGui::IsItemHovered(ImGuiHoveredFlags_AllowWhenDisabled))
 					ImGui::SetTooltip("Items Will Glow Through Walls.\nIncludes Deathboxes.");
 				if (Features::Glow::Item::ItemGlow) {
-					const char* ItemGlowBodyStyleIndex[] = { "Clear", "Light", "Solid", "Light To Dark Fade" };
+					/*const char* ItemGlowBodyStyleIndex[] = { "Clear", "Light", "Solid", "Light To Dark Fade" };
 					ImGui::ComboBox("Inside Style", &Features::Glow::Item::SelectedInsideStyle, ItemGlowBodyStyleIndex, IM_ARRAYSIZE(ItemGlowBodyStyleIndex));
 					const char* ItemGlowOutlineIndex[] = { "None", "Light 1", "Light 2", "Solid", "Gold", "Orange", "Pulsing", "Light Red (Visible Only)", "Red", "Fading (Visible Only)", "Soft", "Visible Only" };
 					ImGui::ComboBox("Outline Style", &Features::Glow::Item::SelectedOutlineStyle, ItemGlowOutlineIndex, IM_ARRAYSIZE(ItemGlowOutlineIndex));
@@ -1649,7 +1651,7 @@ struct Menu
 					ImGui::Checkbox("Legendary", &Features::Glow::Item::Legendary);
 					ImGui::Checkbox("Weapons", &Features::Glow::Item::Weapons);
 					ImGui::Checkbox("Ammo", &Features::Glow::Item::Ammo);
-					ImGui::Checkbox("Deathboxes", &Features::Glow::Item::Deathbox);
+					ImGui::Checkbox("Deathboxes", &Features::Glow::Item::Deathbox);*/
 				}
 
 				ImGui::EndChildFrame();
